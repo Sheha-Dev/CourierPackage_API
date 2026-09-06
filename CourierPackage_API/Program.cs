@@ -50,7 +50,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngularApp", policy =>
     {
         policy
-            .WithOrigins("https://kind-bush-0cb10e100.5.azurestaticapps.net/")
+            .WithOrigins("https://kind-bush-0cb10e100.5.azurestaticapps.net")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
