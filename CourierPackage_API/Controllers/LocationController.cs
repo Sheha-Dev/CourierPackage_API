@@ -62,7 +62,7 @@ namespace CourierPackage_API.Controllers
             });
         }
 
-        [HttpPatch("{locationId}")]
+        [HttpPatch]
         [Route("Deactivate")]
         public async Task<IActionResult> Delete(int locationId)
         {
