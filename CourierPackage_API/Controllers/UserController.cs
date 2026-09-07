@@ -49,7 +49,7 @@ namespace CourierPackage_API.Controllers
 
                 var success = await _userManager.CreateAsync(userOb, user.Password);
 
-                var createdUser = await _userManager.FindByNameAsync(user.UserName);
+                var createdUser = await _userManager.FindByNameAsync(user.UserName) ;
 
                 var roleExists =
                 await _roleManager.RoleExistsAsync(user.RoleName);
@@ -62,11 +62,7 @@ namespace CourierPackage_API.Controllers
                     });
                 }
 
-                var alreadyInRole =
-                await _userManager.IsInRoleAsync(
-                    createdUser,
-                    user.RoleName
-                );
+                var alreadyInRole =await _userManager.IsInRoleAsync(createdUser,user.RoleName);
 
                 if (alreadyInRole)
                 {
