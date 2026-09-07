@@ -1,5 +1,7 @@
 ﻿using CourierPackage_API.Interfaces;
-using Microsoft.AspNetCore.Http;
+using CourierPackage_API.Models.DTOs;
+using CourierPackage_API.Models.Entities;
+using CourierPackage_API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourierPackage_API.Controllers
@@ -9,9 +11,12 @@ namespace CourierPackage_API.Controllers
     public class WarehouseController : ControllerBase
     {
         private readonly IWarehouseService _warehouseService;
-        public WarehouseController(IWarehouseService warehouseService)
+        private readonly ILocationService _locationService;
+
+        public WarehouseController(IWarehouseService warehouseService,ILocationService locationService)
         {
             _warehouseService = warehouseService;
+            _locationService = locationService;
         }
 
         [HttpGet]
@@ -20,7 +25,77 @@ namespace CourierPackage_API.Controllers
         {
             var result = await _warehouseService.GetAllWarehouses();
 
-            return Ok(new { data = result.warehouses, message = result.message });
+            return Ok(new
+            {
+                data = result.warehouses,
+                message = result.message
+            });
+        }
+
+        [HttpPost]
+        [Route("Create")]
+        public async Task<IActionResult> Create(
+            [FromBody] WarehouseFullRequestDto fullRequestDto)
+        {
+            //var locationResult = await _locationService.CreateLocation(fullRequestDto.Location);
+            var result = await _warehouseService.CreateWarehouse(fullRequestDto.Warehouse,fullRequestDto.Location);
+
+            if (!result.success)
+            {
+                return BadRequest(new
+                {
+                    message = result.message
+                });
+            }
+
+            return Ok(new
+            {
+                message = result.message
+            });
+        }
+
+        [HttpPut]
+        [Route("Update")]
+        public async Task<IActionResult> Update(
+            [FromBody] WarehouseFullRequestDto fullRequestDto)
+        {
+            //var locationResult = await _locationService.UpdateLocation(fullRequestDto.Location);
+            var result = await _warehouseService.UpdateWarehouse(fullRequestDto.Warehouse,fullRequestDto.Location);
+
+            if (!result.success)
+            {
+                return NotFound(new
+                {
+                    message = result.message
+                });
+            }
+
+            return Ok(new
+            {
+                message = result.message
+            });
+        }
+
+        [HttpPatch]
+        [Route("Deactivate")]
+        public async Task<IActionResult> Deactivate(
+            int warehouseId)
+        {
+            var result =
+                await _warehouseService.DeactivateWarehouse(warehouseId);
+
+            if (!result.success)
+            {
+                return NotFound(new
+                {
+                    message = result.message
+                });
+            }
+
+            return Ok(new
+            {
+                message = result.message
+            });
         }
     }
 }

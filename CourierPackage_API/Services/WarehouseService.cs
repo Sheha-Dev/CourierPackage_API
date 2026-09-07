@@ -15,5 +15,21 @@ namespace CourierPackage_API.Services
         {
             return await _warehouseRepository.GetAllWarehouses();
         }
+        
+
+        public async Task<(bool success, string message)>CreateWarehouse(WarehouseRequestDto request, LocationRequestDto locRequest)
+        {
+            return await _warehouseRepository.CreateWarehouse(request, locRequest);
+        }
+
+        public async Task<(bool success, string message)>UpdateWarehouse(WarehouseRequestDto request, LocationRequestDto locRequest)
+        {
+            return await _warehouseRepository.UpdateWarehouse(request, locRequest);
+        }
+
+        public async Task<(bool success, string message)>DeactivateWarehouse(int warehouseId)
+        {
+            return await _warehouseRepository.DeactivateWarehouse(warehouseId);
+        }
     }
 }
