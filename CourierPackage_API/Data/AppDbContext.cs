@@ -28,6 +28,8 @@ namespace CourierPackage_API.Data
         public DbSet<PackageVerification> packageVerification { get; set; }
         public DbSet<Province> province { get; set; }
         public DbSet<Recipient> recipient { get; set; }
+        public DbSet<UserLocation> userLocation { get; set; }
+        public DbSet<RecipientLocation> recipientLocation { get; set; }
         public DbSet<User> users { get; set; }
         public DbSet<Vehicle> vehicle { get; set; }
         public DbSet<VehicleType> vehicleType { get; set; }
@@ -44,6 +46,8 @@ namespace CourierPackage_API.Data
             {
                 entity.ToTable("Location");
             });
+
+           
 
             modelBuilder.Entity<BoxType>(entity =>
             {
@@ -88,9 +92,10 @@ namespace CourierPackage_API.Data
             {
                 entity.ToTable("Driver");
 
-                entity.HasOne(e => e.Employee)
+                entity.HasOne(e => e.User)
                       .WithOne(e => e.Driver)
-                      .HasForeignKey<Driver>(e => e.EmployeeId);
+                      .HasForeignKey<Driver>(e => e.UserId)
+                      .OnDelete(DeleteBehavior.NoAction); ;
             });
 
             modelBuilder.Entity<Employee>(entity =>
@@ -249,10 +254,31 @@ namespace CourierPackage_API.Data
                     .HasForeignKey(e => e.SenderId)
                     .OnDelete(DeleteBehavior.NoAction);
 
-                // Recipient -> Sender
-                entity.HasOne(e => e.Receiver)
+                
+            });
+
+            modelBuilder.Entity<RecipientLocation>(entity =>
+            {
+                entity.ToTable("RecipientLocation");
+
+                entity.HasOne(e => e.Recipient)
                     .WithMany()
-                    .HasForeignKey(e => e.UserId)
+                    .HasForeignKey(e => e.RecipientId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.Location)
+                    .WithMany()
+                    .HasForeignKey(e => e.LocationId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.Province)
+                    .WithMany()
+                    .HasForeignKey(e => e.ProvinceId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+                entity.HasOne(e => e.District)
+                    .WithMany()
+                    .HasForeignKey(e => e.DistrictId)
                     .OnDelete(DeleteBehavior.NoAction);
             });
 
@@ -279,9 +305,25 @@ namespace CourierPackage_API.Data
 
                 entity.HasKey(e => e.WarehouseId);
 
+
+                // Warehouse -> Location
+                entity.HasOne(e => e.Location)
+                    .WithMany()
+                    .HasForeignKey(e => e.WarehouseLocationId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+
+                // Warehouse -> Province
                 entity.HasOne(e => e.Province)
-                    .WithMany(e=> e.Warehouses)
+                    .WithMany(e => e.Warehouses)
                     .HasForeignKey(e => e.ProvinceId)
+                    .OnDelete(DeleteBehavior.NoAction);
+
+
+                // Warehouse -> District
+                entity.HasOne(e => e.District)
+                    .WithMany(e => e.Warehouses)
+                    .HasForeignKey(e => e.DistrictId)
                     .OnDelete(DeleteBehavior.NoAction);
             });
 

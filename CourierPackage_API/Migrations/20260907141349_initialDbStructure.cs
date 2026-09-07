@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CourierPackage_API.Migrations
 {
     /// <inheritdoc />
-    public partial class initialDBStructure : Migration
+    public partial class initialDbStructure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -299,17 +299,44 @@ namespace CourierPackage_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Driver",
+                columns: table => new
+                {
+                    DriverId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    VehicleExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VerifiedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Driver", x => x.DriverId);
+                    table.ForeignKey(
+                        name: "FK_Driver_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Recipient",
                 columns: table => new
                 {
                     RecipientId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     SenderId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    NickName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ContactNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -318,11 +345,6 @@ namespace CourierPackage_API.Migrations
                     table.ForeignKey(
                         name: "FK_Recipient_User_SenderId",
                         column: x => x.SenderId,
-                        principalTable: "User",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Recipient_User_UserId",
-                        column: x => x.UserId,
                         principalTable: "User",
                         principalColumn: "Id");
                 });
@@ -347,6 +369,30 @@ namespace CourierPackage_API.Migrations
                     table.ForeignKey(
                         name: "FK_RefreshToken_User_UserId",
                         column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "senderRecipient",
+                columns: table => new
+                {
+                    RecipientId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_senderRecipient", x => x.RecipientId);
+                    table.ForeignKey(
+                        name: "FK_senderRecipient_User_SenderId",
+                        column: x => x.SenderId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -411,8 +457,7 @@ namespace CourierPackage_API.Migrations
                     CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    LocationId = table.Column<int>(type: "int", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -421,19 +466,49 @@ namespace CourierPackage_API.Migrations
                         name: "FK_Warehouse_District_DistrictId",
                         column: x => x.DistrictId,
                         principalTable: "District",
-                        principalColumn: "DistrictId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "DistrictId");
                     table.ForeignKey(
-                        name: "FK_Warehouse_Location_LocationId",
-                        column: x => x.LocationId,
+                        name: "FK_Warehouse_Location_WarehouseLocationId",
+                        column: x => x.WarehouseLocationId,
                         principalTable: "Location",
-                        principalColumn: "LocationId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "LocationId");
                     table.ForeignKey(
                         name: "FK_Warehouse_Province_ProvinceId",
                         column: x => x.ProvinceId,
                         principalTable: "Province",
                         principalColumn: "ProvinceId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Vehicle",
+                columns: table => new
+                {
+                    VehicleId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DriverId = table.Column<int>(type: "int", nullable: false),
+                    VehicleTypeId = table.Column<int>(type: "int", nullable: false),
+                    VehicleInsuranceExpireDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VehicleLicenceExpireDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VehicleExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    verifiedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vehicle", x => x.VehicleId);
+                    table.ForeignKey(
+                        name: "FK_Vehicle_Driver_DriverId",
+                        column: x => x.DriverId,
+                        principalTable: "Driver",
+                        principalColumn: "DriverId");
+                    table.ForeignKey(
+                        name: "FK_Vehicle_VehicleType_VehicleTypeId",
+                        column: x => x.VehicleTypeId,
+                        principalTable: "VehicleType",
+                        principalColumn: "VehicleTypeId");
                 });
 
             migrationBuilder.CreateTable(
@@ -448,11 +523,18 @@ namespace CourierPackage_API.Migrations
                     CreatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    DriverId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Employee", x => x.EmployeeId);
+                    table.ForeignKey(
+                        name: "FK_Employee_Driver_DriverId",
+                        column: x => x.DriverId,
+                        principalTable: "Driver",
+                        principalColumn: "DriverId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Employee_User_UserId",
                         column: x => x.UserId,
@@ -534,31 +616,6 @@ namespace CourierPackage_API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Driver",
-                columns: table => new
-                {
-                    DriverId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    VehicleExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    verifiedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Driver", x => x.DriverId);
-                    table.ForeignKey(
-                        name: "FK_Driver_Employee_EmployeeId",
-                        column: x => x.EmployeeId,
-                        principalTable: "Employee",
-                        principalColumn: "EmployeeId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Notification",
                 columns: table => new
                 {
@@ -581,63 +638,6 @@ namespace CourierPackage_API.Migrations
                         principalTable: "PackageMaster",
                         principalColumn: "PackageId",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PackageVerification",
-                columns: table => new
-                {
-                    PackageVerificationId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PackageId = table.Column<int>(type: "int", nullable: false),
-                    ActualWeight = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
-                    Height = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
-                    Width = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
-                    Length = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
-                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    VerifiedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PackageVerification", x => x.PackageVerificationId);
-                    table.ForeignKey(
-                        name: "FK_PackageVerification_PackageMaster_PackageId",
-                        column: x => x.PackageId,
-                        principalTable: "PackageMaster",
-                        principalColumn: "PackageId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Vehicle",
-                columns: table => new
-                {
-                    VehicleId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DriverId = table.Column<int>(type: "int", nullable: false),
-                    VehicleTypeId = table.Column<int>(type: "int", nullable: false),
-                    VehicleInsuranceExpireDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    VehicleLicenceExpireDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    VehicleExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    verifiedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Vehicle", x => x.VehicleId);
-                    table.ForeignKey(
-                        name: "FK_Vehicle_Driver_DriverId",
-                        column: x => x.DriverId,
-                        principalTable: "Driver",
-                        principalColumn: "DriverId");
-                    table.ForeignKey(
-                        name: "FK_Vehicle_VehicleType_VehicleTypeId",
-                        column: x => x.VehicleTypeId,
-                        principalTable: "VehicleType",
-                        principalColumn: "VehicleTypeId");
                 });
 
             migrationBuilder.CreateTable(
@@ -691,6 +691,31 @@ namespace CourierPackage_API.Migrations
                         column: x => x.SourceWarehouseId,
                         principalTable: "Warehouse",
                         principalColumn: "WarehouseId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PackageVerification",
+                columns: table => new
+                {
+                    PackageVerificationId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PackageId = table.Column<int>(type: "int", nullable: false),
+                    ActualWeight = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    Height = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    Width = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    Length = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    VerifiedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    VerifiedBy = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PackageVerification", x => x.PackageVerificationId);
+                    table.ForeignKey(
+                        name: "FK_PackageVerification_PackageMaster_PackageId",
+                        column: x => x.PackageId,
+                        principalTable: "PackageMaster",
+                        principalColumn: "PackageId");
                 });
 
             migrationBuilder.CreateTable(
@@ -758,10 +783,15 @@ namespace CourierPackage_API.Migrations
                 column: "ProvinceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Driver_EmployeeId",
+                name: "IX_Driver_UserId",
                 table: "Driver",
-                column: "EmployeeId",
+                column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Employee_DriverId",
+                table: "Employee",
+                column: "DriverId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Employee_UserId",
@@ -852,15 +882,15 @@ namespace CourierPackage_API.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Recipient_UserId",
-                table: "Recipient",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RefreshToken_UserId",
                 table: "RefreshToken",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_senderRecipient_SenderId",
+                table: "senderRecipient",
+                column: "SenderId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -910,14 +940,14 @@ namespace CourierPackage_API.Migrations
                 column: "DistrictId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Warehouse_LocationId",
-                table: "Warehouse",
-                column: "LocationId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Warehouse_ProvinceId",
                 table: "Warehouse",
                 column: "ProvinceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Warehouse_WarehouseLocationId",
+                table: "Warehouse",
+                column: "WarehouseLocationId");
         }
 
         /// <inheritdoc />
@@ -942,6 +972,9 @@ namespace CourierPackage_API.Migrations
                 name: "DeliveryFeedback");
 
             migrationBuilder.DropTable(
+                name: "Employee");
+
+            migrationBuilder.DropTable(
                 name: "Notification");
 
             migrationBuilder.DropTable(
@@ -952,6 +985,9 @@ namespace CourierPackage_API.Migrations
 
             migrationBuilder.DropTable(
                 name: "RefreshToken");
+
+            migrationBuilder.DropTable(
+                name: "senderRecipient");
 
             migrationBuilder.DropTable(
                 name: "UserLocation");
@@ -978,25 +1014,22 @@ namespace CourierPackage_API.Migrations
                 name: "PackageStatus");
 
             migrationBuilder.DropTable(
+                name: "Warehouse");
+
+            migrationBuilder.DropTable(
                 name: "Driver");
 
             migrationBuilder.DropTable(
                 name: "VehicleType");
 
             migrationBuilder.DropTable(
-                name: "Employee");
-
-            migrationBuilder.DropTable(
-                name: "User");
-
-            migrationBuilder.DropTable(
-                name: "Warehouse");
-
-            migrationBuilder.DropTable(
                 name: "District");
 
             migrationBuilder.DropTable(
                 name: "Location");
+
+            migrationBuilder.DropTable(
+                name: "User");
 
             migrationBuilder.DropTable(
                 name: "Province");

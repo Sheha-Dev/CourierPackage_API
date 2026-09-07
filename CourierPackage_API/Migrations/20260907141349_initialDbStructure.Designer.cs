@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CourierPackage_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260905064838_initialDBStructure")]
-    partial class initialDBStructure
+    [Migration("20260907141349_initialDbStructure")]
+    partial class initialDbStructure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -202,9 +202,6 @@ namespace CourierPackage_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DriverId"));
 
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -216,20 +213,25 @@ namespace CourierPackage_API.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("VehicleExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("VerifiedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("verifiedBy")
+                    b.Property<string>("VerifiedBy")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime>("VerifiedDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("DriverId");
 
-                    b.HasIndex("EmployeeId")
+                    b.HasIndex("UserId")
                         .IsUnique();
 
                     b.ToTable("Driver", (string)null);
@@ -251,6 +253,9 @@ namespace CourierPackage_API.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("DriverId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -271,6 +276,8 @@ namespace CourierPackage_API.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("EmployeeId");
+
+                    b.HasIndex("DriverId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -661,6 +668,11 @@ namespace CourierPackage_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecipientId"));
 
+                    b.Property<string>("ContactNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -669,8 +681,18 @@ namespace CourierPackage_API.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<string>("NickName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("SenderId")
                         .IsRequired()
@@ -685,16 +707,14 @@ namespace CourierPackage_API.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("UserName")
                         .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("RecipientId");
 
                     b.HasIndex("SenderId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Recipient", (string)null);
                 });
@@ -737,6 +757,45 @@ namespace CourierPackage_API.Migrations
                         .IsUnique();
 
                     b.ToTable("RefreshToken", (string)null);
+                });
+
+            modelBuilder.Entity("CourierPackage_API.Models.Entities.SenderRecipient", b =>
+                {
+                    b.Property<int>("RecipientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecipientId"));
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("UpdatedBy")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("RecipientId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("senderRecipient");
                 });
 
             modelBuilder.Entity("CourierPackage_API.Models.Entities.User", b =>
@@ -1004,9 +1063,6 @@ namespace CourierPackage_API.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
                     b.Property<int>("ProvinceId")
                         .HasColumnType("int");
 
@@ -1035,9 +1091,9 @@ namespace CourierPackage_API.Migrations
 
                     b.HasIndex("DistrictId");
 
-                    b.HasIndex("LocationId");
-
                     b.HasIndex("ProvinceId");
+
+                    b.HasIndex("WarehouseLocationId");
 
                     b.ToTable("Warehouse", (string)null);
                 });
@@ -1199,17 +1255,23 @@ namespace CourierPackage_API.Migrations
 
             modelBuilder.Entity("CourierPackage_API.Models.Entities.Driver", b =>
                 {
-                    b.HasOne("CourierPackage_API.Models.Entities.Employee", "Employee")
+                    b.HasOne("CourierPackage_API.Models.Entities.User", "User")
                         .WithOne("Driver")
-                        .HasForeignKey("CourierPackage_API.Models.Entities.Driver", "EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("CourierPackage_API.Models.Entities.Driver", "UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Employee");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CourierPackage_API.Models.Entities.Employee", b =>
                 {
+                    b.HasOne("CourierPackage_API.Models.Entities.Driver", "Driver")
+                        .WithMany()
+                        .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("CourierPackage_API.Models.Entities.User", "User")
                         .WithOne("Employee")
                         .HasForeignKey("CourierPackage_API.Models.Entities.Employee", "UserId")
@@ -1221,6 +1283,8 @@ namespace CourierPackage_API.Migrations
                         .HasForeignKey("CourierPackage_API.Models.Entities.Employee", "WarehouseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Driver");
 
                     b.Navigation("User");
 
@@ -1359,14 +1423,6 @@ namespace CourierPackage_API.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("CourierPackage_API.Models.Entities.User", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
                     b.Navigation("Sender");
                 });
 
@@ -1379,6 +1435,17 @@ namespace CourierPackage_API.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CourierPackage_API.Models.Entities.SenderRecipient", b =>
+                {
+                    b.HasOne("CourierPackage_API.Models.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("CourierPackage_API.Models.Entities.UserLocation", b =>
@@ -1438,20 +1505,20 @@ namespace CourierPackage_API.Migrations
             modelBuilder.Entity("CourierPackage_API.Models.Entities.Warehouse", b =>
                 {
                     b.HasOne("CourierPackage_API.Models.Entities.District", "District")
-                        .WithMany()
+                        .WithMany("Warehouses")
                         .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CourierPackage_API.Models.Entities.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("CourierPackage_API.Models.Entities.Province", "Province")
                         .WithMany("Warehouses")
                         .HasForeignKey("ProvinceId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("CourierPackage_API.Models.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("WarehouseLocationId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1526,12 +1593,8 @@ namespace CourierPackage_API.Migrations
             modelBuilder.Entity("CourierPackage_API.Models.Entities.District", b =>
                 {
                     b.Navigation("UserLocations");
-                });
 
-            modelBuilder.Entity("CourierPackage_API.Models.Entities.Employee", b =>
-                {
-                    b.Navigation("Driver")
-                        .IsRequired();
+                    b.Navigation("Warehouses");
                 });
 
             modelBuilder.Entity("CourierPackage_API.Models.Entities.PackageMaster", b =>
@@ -1557,6 +1620,9 @@ namespace CourierPackage_API.Migrations
 
             modelBuilder.Entity("CourierPackage_API.Models.Entities.User", b =>
                 {
+                    b.Navigation("Driver")
+                        .IsRequired();
+
                     b.Navigation("Employee")
                         .IsRequired();
 

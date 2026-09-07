@@ -4,6 +4,7 @@ using CourierPackage_API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CourierPackage_API.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260907143724_packageMasterTableRecipientIdDataTypeChange")]
+    partial class packageMasterTableRecipientIdDataTypeChange
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -714,68 +717,6 @@ namespace CourierPackage_API.Migrations
                     b.ToTable("Recipient", (string)null);
                 });
 
-            modelBuilder.Entity("CourierPackage_API.Models.Entities.RecipientLocation", b =>
-                {
-                    b.Property<int>("RecipientLocationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RecipientLocationId"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DistrictId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProvinceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RecipientId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("StreetName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("UpdatedBy")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("RecipientLocationId");
-
-                    b.HasIndex("DistrictId");
-
-                    b.HasIndex("LocationId");
-
-                    b.HasIndex("ProvinceId");
-
-                    b.HasIndex("RecipientId");
-
-                    b.ToTable("RecipientLocation", (string)null);
-                });
-
             modelBuilder.Entity("CourierPackage_API.Models.Entities.RefreshToken", b =>
                 {
                     b.Property<int>("RefreshTokenId")
@@ -1442,41 +1383,6 @@ namespace CourierPackage_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("CourierPackage_API.Models.Entities.RecipientLocation", b =>
-                {
-                    b.HasOne("CourierPackage_API.Models.Entities.District", "District")
-                        .WithMany()
-                        .HasForeignKey("DistrictId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("CourierPackage_API.Models.Entities.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("CourierPackage_API.Models.Entities.Province", "Province")
-                        .WithMany()
-                        .HasForeignKey("ProvinceId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("CourierPackage_API.Models.Entities.Recipient", "Recipient")
-                        .WithMany()
-                        .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("District");
-
-                    b.Navigation("Location");
-
-                    b.Navigation("Province");
-
-                    b.Navigation("Recipient");
                 });
 
             modelBuilder.Entity("CourierPackage_API.Models.Entities.RefreshToken", b =>
