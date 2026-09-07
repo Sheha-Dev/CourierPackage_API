@@ -41,8 +41,8 @@ namespace CourierPackage_API.Repositories
         {
             var location = new Location
             {
-                LatitudeCoordinate = request.LatitudeCoordinate,
-                LogitudeCoordinate = request.LongitudeCoordinate,
+                LatitudeCoordinate = request.Latitude,
+                LogitudeCoordinate = request.Longitude,
                 CreatedBy = request.TrnUser,
                 CreatedDate = DateTime.Now,
                 IsActive = true
@@ -68,10 +68,10 @@ namespace CourierPackage_API.Repositories
             }
 
             location.LatitudeCoordinate =
-                request.LatitudeCoordinate;
+                request.Latitude;
 
             location.LogitudeCoordinate =
-                request.LongitudeCoordinate;
+                request.Longitude;
 
             location.UpdatedBy = request.TrnUser;
             location.UpdatedDate = DateTime.Now;

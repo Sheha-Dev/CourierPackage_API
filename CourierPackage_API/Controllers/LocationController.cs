@@ -64,7 +64,7 @@ namespace CourierPackage_API.Controllers
 
         [HttpPatch]
         [Route("Deactivate")]
-        public async Task<IActionResult> Delete(int locationId)
+        public async Task<IActionResult> Deactivate(int locationId)
         {
             var result =
                 await _locationService.DeleteLocation(locationId);
