@@ -14,8 +14,9 @@ namespace CourierPackage_API.Models.Entities
         public bool IsActive { get; set; }
 
         // Navigation 
-        public Employee Employee { get; set; } = null!;
+        public Driver Driver { get; set; } = null!;
         public ICollection<UserLocation> UserLocations { get; set; } = null!;
         public RefreshToken RefreshToken { get; set; } = null!;
+        public Employee Employee { get; set; } = null!;
     }
 }

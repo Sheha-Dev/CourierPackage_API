@@ -2,13 +2,18 @@
 
 namespace CourierPackage_API.Models.Entities
 {
-    public class District
+    public class RecipientLocation
     {
         [Key]
-        public int DistrictId { get; set; }
+        public int RecipientLocationId { get; set; }
+        public int RecipientId { get; set; } 
+        public int LocationId { get; set; }
         public int ProvinceId { get; set; }
+        public int DistrictId { get; set; }
         [MaxLength(50)]
-        public string DistrictName { get; set; } = string.Empty;
+        public string StreetName { get; set; } = string.Empty;
+        [MaxLength(100)]
+        public string Address { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         [MaxLength(50)]
         public string CreatedBy { get; set; } = string.Empty;
@@ -17,10 +22,12 @@ namespace CourierPackage_API.Models.Entities
         public string UpdatedBy { get; set; } = string.Empty;
         public bool IsActive { get; set; }
 
+
         // foreign keys
+
+        public Location Location { get; set; } = null!;
         public Province Province { get; set; } = null!;
-        public ICollection<UserLocation>? UserLocations { get; set; } = null!;
-        public ICollection<Warehouse> Warehouses { get; set; }
-            = new List<Warehouse>();
+        public District District { get; set; } = null!;
+        public Recipient Recipient { get; set; } = null!;
     }
 }

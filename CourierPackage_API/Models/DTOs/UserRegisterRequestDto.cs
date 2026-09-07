@@ -16,7 +16,7 @@ namespace CourierPackage_API.Models.DTOs
         [MaxLength(50)]
         public string NickName { get; set; } = string.Empty;
         [MaxLength(50)]
-        public string RoleName { get; set; }
+        public string RoleName { get; set; } = string.Empty;
         [MaxLength(50)]
         public string TrnUser { get; set; } = string.Empty;
     }

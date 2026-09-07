@@ -6,17 +6,18 @@ namespace CourierPackage_API.Models.Entities
     {
         [Key]
         public int DriverId { get; set; }
-        public int EmployeeId { get; set; }
+        [MaxLength(450)]
+        public string UserId { get; set; } = string.Empty;
         public DateTime VehicleExpirationDate { get; set; }
         public DateTime VerifiedDate { get; set; }
         [MaxLength(50)]
-        public string verifiedBy { get; set; } = string.Empty;
+        public string VerifiedBy { get; set; } = string.Empty;
         public DateTime UpdatedDate { get; set; }
         [MaxLength(50)]
         public string UpdatedBy { get; set; } = string.Empty;
         public bool IsActive { get; set; }
 
         // foreign keys
-        public Employee Employee { get; set; } = null!;
+        public User User { get; set; } = null!;
     }
 }
