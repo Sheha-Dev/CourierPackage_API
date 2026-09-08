@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - CurrierPackageWebAPI
+name: Build and deploy ASP.Net Core app to Azure Web App - CourierPackageAPI
 
 on:
   push:
@@ -51,15 +51,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_673E922F0BE14DC48E5F8F44982CB0D9 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_1F8AACA1CCCE4868B7D31783B1303A5F }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_10CB6364C23740669675845C6D80C3EB }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_12EEC2E9793641CB97A302ECF3CCC79C }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_94A4AFEC0C5845A8ADDF298FC8E0C9B1 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0DBD008C23F3400A85A32329B5C48A38 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'CurrierPackageWebAPI'
+          app-name: 'CourierPackageAPI'
           slot-name: 'Production'
           package: .
           
