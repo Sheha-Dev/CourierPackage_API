@@ -50,11 +50,20 @@ namespace CourierPackage_API.Repositories
                                 BoxDimensionId =
                                     p.BoxDimensionId,
 
+                                BoxHeight = 
+                                    p.BoxDimension.Height,
+
+                                BoxLength = 
+                                    p.BoxDimension.Length,
+
+                                BoxWidth = 
+                                    p.BoxDimension.Width,
+
                                 SenderId =
                                     p.SenderId,
 
                                 RecipientId =
-                                    p.RecipientId,
+                                    p.RecipientId ?? 0,
 
                                 EstimatedWeight =
                                     p.EstimatedWeight,
@@ -151,7 +160,7 @@ namespace CourierPackage_API.Repositories
                                     p.SenderId,
 
                                 RecipientId =
-                                    p.RecipientId,
+                                    p.RecipientId ?? 0,
 
                                 EstimatedWeight =
                                     p.EstimatedWeight,
@@ -266,7 +275,7 @@ namespace CourierPackage_API.Repositories
                                     p.SenderId,
 
                                 RecipientId =
-                                    p.RecipientId,
+                                    p.RecipientId ?? 0,
 
                                 EstimatedWeight =
                                     p.EstimatedWeight,
@@ -327,95 +336,118 @@ namespace CourierPackage_API.Repositories
         // CREATE PACKAGE
         // =========================================
 
-        public async Task<
-            (
-                bool success,
-                string message,
-                int packageId
-            )>
-            CreatePackage(
-                PackageRequestDto request
-            )
+        public async Task<(bool success, string message, int packageId)>
+    CreatePackage(PackageRequestDto request)
         {
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync();
+
             try
             {
-                var now =
-                    DateTime.UtcNow;
+                int boxDiId;
 
+                var dimension = await _context.boxDimensions
+                    .FirstOrDefaultAsync(di =>
+                        di.Length == request.boxDimensionRequestDto.Length &&
+                        di.Width == request.boxDimensionRequestDto.Width &&
+                        di.Height == request.boxDimensionRequestDto.Height);
 
-                var package =
-                    new PackageMaster
+                if (dimension != null)
+                {
+                    boxDiId = dimension.BoxDimensionId;
+                }
+                else
+                {
+                    var boxDi = new BoxDimension
                     {
-                        PackageTrackingId =
-                            request.PackageTrackingId,
-
-                        BoxTypeId =
-                            request.BoxTypeId,
-
-                        BoxDimensionId =
-                            request.BoxDimensionId,
-
-                        SenderId =
-                            request.SenderId,
-
-                        RecipientId =
-                            request.RecipientId,
-
-                        EstimatedWeight =
-                            request.EstimatedWeight,
-
-                        IsVerified =
-                            request.IsVerified,
-
-                        StatusId =
-                            request.StatusId,
-
-                        HandOverWarehouseId =
-                            request.HandOverWarehouseId,
-
-                        DestinationId =
-                            request.DestinationId,
-
-                        EstimatedAmount =
-                            request.EstimatedAmount,
-
-                        /*
-                            ActualAmount should normally
-                            be set after verification.
-                        */
-                        ActualAmount = 0,
-
-                        ReceivedDate =
-                            request.ReceivedDate,
-
-                        ExpectedDeliverDate =
-                            request.ExpectedDeliverDate,
-
-                        CreatedDate =
-                            now,
-
-                        CreatedBy =
-                            request.TrnUser,
-
-                        UpdatedDate =
-                            now,
-
-                        UpdatedBy =
-                            request.TrnUser,
-
-                        IsActive = true
+                        Length = request.boxDimensionRequestDto.Length,
+                        Width = request.boxDimensionRequestDto.Width,
+                        Height = request.boxDimensionRequestDto.Height,
+                        CreatedBy = request.TrnUser,
+                        CreatedDate = DateTime.UtcNow
                     };
 
+                    await _context.boxDimensions.AddAsync(boxDi);
 
-                await _context.packageMaster
-                    .AddAsync(
-                        package
-                    );
+                    // Required to generate BoxDimensionId
+                    await _context.SaveChangesAsync();
 
+                    boxDiId = boxDi.BoxDimensionId;
+                }
 
-                await _context
-                    .SaveChangesAsync();
+                // get status id 
 
+                var status = await _context.packageStatus.FirstOrDefaultAsync( x => x.StatusName == "Initial");
+
+                // set destination location and get destination location id 
+
+                int desId;
+
+                var destination = await _context.locations
+                    .FirstOrDefaultAsync(l =>
+                        l.LatitudeCoordinate == request.Destination.Latitude &&
+                        l.LogitudeCoordinate == request.Destination.Longitude );
+
+                if (destination != null)
+                {
+                    desId = destination.LocationId;
+                }
+                else
+                {
+                    var location = new Location
+                    {
+                        LatitudeCoordinate = request.Destination.Latitude,
+                        LogitudeCoordinate = request.Destination.Longitude,
+                        CreatedBy = request.TrnUser,
+                        CreatedDate = DateTime.UtcNow,
+                        IsActive = true,
+                    };
+
+                    await _context.locations.AddAsync(location);
+
+                    // Required to generate BoxDimensionId
+                    await _context.SaveChangesAsync();
+
+                    desId = location.LocationId;
+                }
+
+                var now = DateTime.UtcNow;
+
+                var package = new PackageMaster
+                {
+                    PackageTrackingId = "0",
+                    BoxTypeId = request.BoxTypeId,
+                    BoxDimensionId = boxDiId,
+                    SenderId = request.SenderId,
+                    RecipientId = request.RecipientId,
+                    EstimatedWeight = request.EstimatedWeight,
+                    IsVerified = request.IsVerified,
+                    StatusId = status.PackageStatusId,
+                    HandOverWarehouseId = request.HandOverWarehouseId,
+                    DestinationId = desId,
+                    EstimatedAmount = request.EstimatedAmount,
+                    ActualAmount = 0,
+                    ReceivedDate = request.ReceivedDate,
+                    ExpectedDeliverDate = request.ExpectedDeliverDate,
+
+                    CreatedDate = now,
+                    CreatedBy = request.TrnUser,
+                    UpdatedDate = now,
+                    UpdatedBy = request.TrnUser,
+                    IsActive = true
+                };
+
+                await _context.packageMaster.AddAsync(package);
+
+                await _context.SaveChangesAsync();
+
+                //var package = await _context.packageMaster.FirstOrDefaultAsync(x => x.PackageId == package.PackageId);
+
+                package.PackageTrackingId = "00000"+package.PackageId;
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
 
                 return (
                     true,
@@ -425,6 +457,8 @@ namespace CourierPackage_API.Repositories
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
+
                 return (
                     false,
                     ex.Message,
@@ -436,47 +470,27 @@ namespace CourierPackage_API.Repositories
 
         // =========================================
         // UPDATE PACKAGE
-        // ONLY WHEN STATUS = RECEIVED
+        // ONLY WHEN STATUS = INITIAL
         // =========================================
 
-        public async Task<
-            (
-                bool success,
-                string message
-            )>
-            UpdatePackage(
-                PackageRequestDto request
-            )
+        public async Task<(bool success, string message)>
+            UpdatePackage(PackageRequestDto request)
         {
+            await using var transaction =
+                await _context.Database.BeginTransactionAsync();
+
             try
             {
-                /*
-                    Get package including current status.
-
-                    Important:
-                    We check the CURRENT database status,
-                    not request.StatusId.
-
-                    Otherwise the frontend could simply
-                    send a "Received" status and bypass
-                    the rule.
-                */
+                // =========================================
+                // GET PACKAGE
+                // =========================================
 
                 var package =
                     await _context.packageMaster
-
-                        .Include(
-                            p => p.PackageStatus
-                        )
-
-                        .FirstOrDefaultAsync(
-                            p =>
-                                p.PackageId ==
-                                    request.PackageId &&
-
-                                p.IsActive
-                        );
-
+                        .Include(p => p.PackageStatus)
+                        .FirstOrDefaultAsync(p =>
+                            p.PackageId == request.PackageId &&
+                            p.IsActive);
 
                 if (package == null)
                 {
@@ -487,32 +501,144 @@ namespace CourierPackage_API.Repositories
                 }
 
 
-                /*
-                    Change StatusName to whatever your
-                    PackageStatus property is actually
-                    called.
-                */
+                // =========================================
+                // CHECK PACKAGE STATUS
+                // ONLY INITIAL CAN BE UPDATED
+                // =========================================
 
-                if (
-                    !string.Equals(
+                if (!string.Equals(
                         package.PackageStatus.StatusName,
-                        "Received",
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                )
+                        "Initial",
+                        StringComparison.OrdinalIgnoreCase))
                 {
                     return (
                         false,
-                        "Package cannot be updated because its status is not Received."
+                        "Package cannot be updated because its status is not Initial."
                     );
                 }
 
+
+                // =========================================
+                // GET / CREATE BOX DIMENSION
+                // =========================================
+
+                int boxDiId;
+
+                var dimension =
+                    await _context.boxDimensions
+                        .FirstOrDefaultAsync(di =>
+                            di.Length ==
+                                request.boxDimensionRequestDto.Length &&
+
+                            di.Width ==
+                                request.boxDimensionRequestDto.Width &&
+
+                            di.Height ==
+                                request.boxDimensionRequestDto.Height
+                        );
+
+                if (dimension != null)
+                {
+                    // Existing dimension
+                    boxDiId =
+                        dimension.BoxDimensionId;
+                }
+                else
+                {
+                    // Create new dimension
+                    var boxDi =
+                        new BoxDimension
+                        {
+                            Length =
+                                request.boxDimensionRequestDto.Length,
+
+                            Width =
+                                request.boxDimensionRequestDto.Width,
+
+                            Height =
+                                request.boxDimensionRequestDto.Height,
+
+                            CreatedBy =
+                                request.TrnUser,
+
+                            CreatedDate =
+                                DateTime.UtcNow
+                        };
+
+                    await _context.boxDimensions
+                        .AddAsync(boxDi);
+
+                    // Generate BoxDimensionId
+                    await _context.SaveChangesAsync();
+
+                    boxDiId =
+                        boxDi.BoxDimensionId;
+                }
+
+
+                // =========================================
+                // GET / CREATE DESTINATION LOCATION
+                // =========================================
+
+                int desId;
+
+                var destination =
+                    await _context.locations
+                        .FirstOrDefaultAsync(l =>
+                            l.LatitudeCoordinate ==
+                                request.Destination.Latitude &&
+
+                            l.LogitudeCoordinate ==
+                                request.Destination.Longitude
+                        );
+
+                if (destination != null)
+                {
+                    // Existing destination
+                    desId =
+                        destination.LocationId;
+                }
+                else
+                {
+                    // Create new destination
+                    var location =
+                        new Location
+                        {
+                            LatitudeCoordinate =
+                                request.Destination.Latitude,
+
+                            LogitudeCoordinate =
+                                request.Destination.Longitude,
+
+                            CreatedBy =
+                                request.TrnUser,
+
+                            CreatedDate =
+                                DateTime.UtcNow,
+
+                            IsActive = true
+                        };
+
+                    await _context.locations
+                        .AddAsync(location);
+
+                    // Generate LocationId
+                    await _context.SaveChangesAsync();
+
+                    desId =
+                        location.LocationId;
+                }
+
+
+                // =========================================
+                // UPDATE PACKAGE
+                // =========================================
 
                 package.BoxTypeId =
                     request.BoxTypeId;
 
                 package.BoxDimensionId =
-                    request.BoxDimensionId;
+                    boxDiId;
 
                 package.SenderId =
                     request.SenderId;
@@ -527,7 +653,7 @@ namespace CourierPackage_API.Repositories
                     request.HandOverWarehouseId;
 
                 package.DestinationId =
-                    request.DestinationId;
+                    desId;
 
                 package.EstimatedAmount =
                     request.EstimatedAmount;
@@ -538,17 +664,6 @@ namespace CourierPackage_API.Repositories
                 package.ExpectedDeliverDate =
                     request.ExpectedDeliverDate;
 
-
-                /*
-                    I recommend NOT changing
-                    StatusId from this general
-                    update method.
-
-                    Handle status changes in a separate
-                    ChangePackageStatus() method.
-                */
-
-
                 package.UpdatedDate =
                     DateTime.UtcNow;
 
@@ -556,9 +671,13 @@ namespace CourierPackage_API.Repositories
                     request.TrnUser;
 
 
-                await _context
-                    .SaveChangesAsync();
+                // =========================================
+                // SAVE
+                // =========================================
 
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
 
                 return (
                     true,
@@ -567,6 +686,8 @@ namespace CourierPackage_API.Repositories
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
+
                 return (
                     false,
                     ex.Message

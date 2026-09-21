@@ -15,9 +15,9 @@ namespace CourierPackage_API.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<(IEnumerable<RecipientResponseDto> recipients, string message)> GetAllRecipients()
+        public async Task<(IEnumerable<RecipientResponseDto> recipients, string message)> GetAllRecipients(string userId)
         {
-            var list = await _dbContext.recipient.ToListAsync();
+            var list = await _dbContext.recipient.Where( x => x.SenderId == userId ).ToListAsync( );
 
             var result = new List<RecipientResponseDto>();
 

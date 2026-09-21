@@ -6,9 +6,12 @@ namespace CourierPackage_API.Models.DTOs
     public class PackageResponseDto
     {
         public int PackageId { get; set; }
-        public int PackageTrackingId { get; set; }
+        public string PackageTrackingId { get; set; }
         public int BoxTypeId { get; set; }
         public int BoxDimensionId { get; set; }
+        public decimal BoxHeight { get; set; }
+        public decimal BoxLength { get; set; }
+        public decimal BoxWidth { get; set; }
         public string SenderId { get; set; } = string.Empty;
         public int RecipientId { get; set; } 
         public decimal EstimatedWeight { get; set; }

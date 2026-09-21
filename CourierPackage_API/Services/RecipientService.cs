@@ -12,9 +12,9 @@ namespace CourierPackage_API.Services
             _recipientRepository = recipientRepository;
         }
 
-        public async Task<(IEnumerable<RecipientResponseDto> recipients, string message)> GetAllRecipients()
+        public async Task<(IEnumerable<RecipientResponseDto> recipients, string message)> GetAllRecipients(string userId)
         {
-            return await _recipientRepository.GetAllRecipients();
+            return await _recipientRepository.GetAllRecipients(userId);
         }
         public async Task<(bool success, string message)> CreateRecipient(RecipientRequestDto request)
         {

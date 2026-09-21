@@ -18,7 +18,10 @@ namespace CourierPackage_API.Repositories
 
         public async Task<(IEnumerable<WarehouseResponseDto> warehouses, string message)> GetAllWarehouses()
         {
-            var list = await _dbContext.warehouses.ToListAsync();
+            //var list = await _dbContext.warehouses.ToListAsync();]
+            var list = await _dbContext.warehouses
+                        .Include(x => x.Location)
+                        .ToListAsync();
 
             var result = new List<WarehouseResponseDto>();
 
@@ -33,6 +36,8 @@ namespace CourierPackage_API.Repositories
                 warehouseResponseDto.ProvinceId = warehouse.ProvinceId;
                 warehouseResponseDto.DistrictId = warehouse.DistrictId;
                 warehouseResponseDto.WarehouseLocationId = warehouse.WarehouseLocationId;
+                warehouseResponseDto.WarehouseLatitude = warehouse.Location.LatitudeCoordinate;
+                warehouseResponseDto.WarehouseLongitude = warehouse.Location.LogitudeCoordinate;
                 warehouseResponseDto.IsActive = warehouse.IsActive;
 
                 result.Add(warehouseResponseDto);

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CourierPackage_API.Models.Entities;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace CourierPackage_API.Models.DTOs
@@ -8,7 +9,7 @@ namespace CourierPackage_API.Models.DTOs
         public int PackageId { get; set; }
         public int PackageTrackingId { get; set; }
         public int BoxTypeId { get; set; }
-        public int BoxDimensionId { get; set; }
+        public BoxDimensionRequestDto boxDimensionRequestDto { get; set; } = null!;
         public string SenderId { get; set; } = string.Empty;
         public int RecipientId { get; set; }
         public decimal EstimatedWeight { get; set; }
@@ -19,6 +20,7 @@ namespace CourierPackage_API.Models.DTOs
         public decimal EstimatedAmount { get; set; }
         public DateTime ReceivedDate { get; set; }
         public DateTime ExpectedDeliverDate { get; set; }
+        public LocationRequestDto Destination { get; set; }
         public string TrnUser { get; set; } = string.Empty;
     }
 }

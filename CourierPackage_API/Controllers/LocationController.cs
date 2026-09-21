@@ -82,5 +82,14 @@ namespace CourierPackage_API.Controllers
                 message = result.message
             });
         }
+
+        [HttpGet]
+        [Route("GetById")]
+        public async Task<IActionResult> GetLocationById(int locationId)
+        {
+            var result = await _locationService.GetLocationById(locationId);
+
+            return Ok(new { data = result.location, message = result.message });
+        }
     }
 }

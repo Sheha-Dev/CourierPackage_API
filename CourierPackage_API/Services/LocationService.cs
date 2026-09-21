@@ -28,5 +28,10 @@ namespace CourierPackage_API.Services
         {
             return await _locationRepository.DeleteLocation(locationId);
         }
+
+        public async Task<(LocationResponseDto location, string message)> GetLocationById(int locationId)
+        {
+            return await _locationRepository.GetLocationById(locationId);
+        }
     }
 }

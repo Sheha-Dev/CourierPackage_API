@@ -50,7 +50,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAngularApp", policy =>
     {
         policy
-            .WithOrigins("https://kind-bush-0cb10e100.5.azurestaticapps.net")
+            .WithOrigins(
+            "https://kind-bush-0cb10e100.5.azurestaticapps.net",
+            "http://localhost:4200"
+            )
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -133,6 +136,8 @@ builder.Services.AddScoped<IDistrictService, DistrictService>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<ILocationService, LocationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IRecipientService, RecipientService>();
+builder.Services.AddScoped<IRecipientRepository, RecipientRepository>();
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {

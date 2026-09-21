@@ -7,12 +7,12 @@ namespace CourierPackage_API.Models.Entities
     {
         [Key]
         public int PackageId { get; set; }
-        public int PackageTrackingId { get; set; }
+        public string PackageTrackingId { get; set; }
         public int BoxTypeId { get; set; }
         public int BoxDimensionId { get; set; }
         [MaxLength(450)]
         public string SenderId { get; set; } = string.Empty;
-        public int RecipientId { get; set; }
+        public int? RecipientId { get; set; }
         [Precision(18,4)]
         public decimal EstimatedWeight { get; set; }
         public bool IsVerified { get; set; }
@@ -40,7 +40,7 @@ namespace CourierPackage_API.Models.Entities
         public User Sender { get; set; } = null!;
         public PackageStatus PackageStatus { get; set; } = null!;
         public Warehouse SourceWarehouse { get; set; } = null!;
-        public Warehouse DestinationWarehouse { get; set; } = null!;
+        public Location DestinationWarehouse { get; set; } = null!;
         public ICollection<Notification> Notifications { get; set; } = null!;
         public PackageVerification PackageVerification { get; set; } = null!;
         public Recipient Recipient { get; set; } = null!;

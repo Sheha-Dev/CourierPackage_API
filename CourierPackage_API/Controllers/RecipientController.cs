@@ -17,10 +17,10 @@ namespace CourierPackage_API.Controllers
         }
 
         [HttpGet]
-        [Route("GetAll")]
-        public async Task<IActionResult> GetAllRecipients()
+        [Route("GetAllByUser")]
+        public async Task<IActionResult> GetAllRecipients(string userId)
         {
-            var result = await _recipientService.GetAllRecipients();
+            var result = await _recipientService.GetAllRecipients(userId);
 
             return Ok(new { data = result.recipients, message = result.message });
         }

@@ -2,6 +2,7 @@
 using CourierPackage_API.Interfaces;
 using CourierPackage_API.Models.DTOs;
 using CourierPackage_API.Models.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourierPackage_API.Repositories
@@ -103,6 +104,25 @@ namespace CourierPackage_API.Repositories
             await _dbContext.SaveChangesAsync();
 
             return (true, "Location deleted successfully.");
+        }
+
+        public async Task<(LocationResponseDto location, string message)> GetLocationById(int locationId)
+        {
+            var loc = await _dbContext.locations.FirstOrDefaultAsync( l => l.LocationId == locationId);
+
+            if (loc == null) 
+            {
+                return (null, "Invalid location id.");
+            }
+
+            var location = new LocationResponseDto
+            {
+                LocationId = locationId,
+                LatitudeCoordinate = loc.LatitudeCoordinate,
+                LongitudeCoordinate = loc.LogitudeCoordinate
+            };
+
+            return (location, "Locations retrieved successfully.");
         }
 
     }

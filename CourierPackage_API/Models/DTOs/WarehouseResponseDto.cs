@@ -7,6 +7,8 @@ namespace CourierPackage_API.Models.DTOs
         public int WarehouseId { get; set; }
         public string WarehouseName { get; set; } = string.Empty;
         public int WarehouseLocationId { get; set; }
+        public decimal WarehouseLongitude { get; set; }
+        public decimal WarehouseLatitude { get; set; }
         public int ProvinceId { get; set; }
         public int DistrictId { get; set; }
         public string StreetName { get; set; } = string.Empty;

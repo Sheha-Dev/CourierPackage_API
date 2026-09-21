@@ -8,5 +8,6 @@ namespace CourierPackage_API.Interfaces
         Task<(bool success, string message)> CreateLocation(LocationRequestDto request);
         Task<(bool success, string message)> UpdateLocation(LocationRequestDto request);
         Task<(bool success, string message)> DeleteLocation(int locationId);
+        Task<(LocationResponseDto location, string message)> GetLocationById(int locationId);
     }
 }
