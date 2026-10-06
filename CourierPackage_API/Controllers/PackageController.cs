@@ -9,13 +9,13 @@ namespace CourierPackage_API.Controllers
     [ApiController]
     public class PackageController : ControllerBase
     {
-        private readonly IPackageRepository _packageRepository;
+        private readonly IPackageService _packageService;
 
         public PackageController(
-            IPackageRepository packageRepository
+            IPackageService packageService
         )
         {
-            _packageRepository = packageRepository;
+            _packageService = packageService;
         }
 
 
@@ -24,7 +24,7 @@ namespace CourierPackage_API.Controllers
         public async Task<IActionResult> GetAllPackages()
         {
             var result =
-                await _packageRepository
+                await _packageService
                     .GetAllPackages();
 
             return Ok(new
@@ -42,7 +42,7 @@ namespace CourierPackage_API.Controllers
         )
         {
             var result =
-                await _packageRepository
+                await _packageService
                     .GetPackageByPackageId(
                         packageId
                     );
@@ -80,7 +80,7 @@ namespace CourierPackage_API.Controllers
             }
 
             var result =
-                await _packageRepository
+                await _packageService
                     .GetPackageByDateRange(
                         startDate,
                         endDate
@@ -101,7 +101,7 @@ namespace CourierPackage_API.Controllers
         )
         {
             var result =
-                await _packageRepository
+                await _packageService
                     .CreatePackage(
                         request
                     );
@@ -132,7 +132,7 @@ namespace CourierPackage_API.Controllers
         )
         {
             var result =
-                await _packageRepository
+                await _packageService
                     .UpdatePackage(
                         request
                     );
@@ -160,7 +160,7 @@ namespace CourierPackage_API.Controllers
         )
         {
             var result =
-                await _packageRepository
+                await _packageService
                     .DeactivatePackage(
                         packageId,
                         trnUser
@@ -177,6 +177,33 @@ namespace CourierPackage_API.Controllers
             return Ok(new
             {
                 message = result.message
+            });
+        }
+
+        [HttpGet]
+        [Route("GetByUserId")]
+        public async Task<IActionResult> GetByUserId(
+            string userId
+        )
+        {
+            var result =
+                await _packageService
+                    .GetByUserId(
+                        userId
+                    );
+
+            if (result == null)
+            {
+                return NotFound(new
+                {
+                    message = "Package not found."
+                });
+            }
+
+            return Ok(new
+            {
+                data = result,
+                message = "Package loaded successfully."
             });
         }
     }
