@@ -27,7 +27,7 @@ namespace CourierPackage_API.Repositories
         {
             var packages =
                 await _context.packageMaster
-
+                    .Include( p => p.PackageVerification)
                     .AsNoTracking()
 
                     .Where(
@@ -105,7 +105,13 @@ namespace CourierPackage_API.Repositories
                                     p.UpdatedBy,
 
                                 IsActive =
-                                    p.IsActive
+                                    p.IsActive,
+
+                                VerifiedBy = 
+                                    p.PackageVerification.VerifiedBy,
+
+                                VerifiedDate = 
+                                    p.PackageVerification.VerifiedDate
                             }
                     )
 
@@ -759,6 +765,104 @@ namespace CourierPackage_API.Repositories
                     ex.Message
                 );
             }
+        }
+
+        public async Task<List<PackageResponseDto>?>
+            GetByUserId(
+                string userId
+            )
+        {
+            var package =
+                await _context.packageMaster
+
+                    .Include( d => d.BoxDimension)
+                    .AsNoTracking()
+
+
+                    .Where(
+                        p =>
+                            p.CreatedBy == userId 
+                    )
+
+                    .Select(
+                        p =>
+                            new PackageResponseDto
+                            {
+                                PackageId =
+                                    p.PackageId,
+
+                                PackageTrackingId =
+                                    p.PackageTrackingId,
+
+                                BoxTypeId =
+                                    p.BoxTypeId,
+
+                                BoxDimensionId =
+                                    p.BoxDimensionId,
+
+                                SenderId =
+                                    p.SenderId,
+
+                                RecipientId =
+                                    p.RecipientId ?? 0,
+
+                                EstimatedWeight =
+                                    p.EstimatedWeight,
+
+                                IsVerified =
+                                    p.IsVerified,
+
+                                StatusId =
+                                    p.StatusId,
+
+                                HandOverWarehouseId =
+                                    p.HandOverWarehouseId,
+
+                                DestinationId =
+                                    p.DestinationId,
+
+                                EstimatedAmount =
+                                    p.EstimatedAmount,
+
+                                ActualAmount =
+                                    p.ActualAmount,
+
+                                ReceivedDate =
+                                    p.ReceivedDate,
+
+                                ExpectedDeliverDate =
+                                    p.ExpectedDeliverDate,
+
+                                CreatedDate =
+                                    p.CreatedDate,
+
+                                CreatedBy =
+                                    p.CreatedBy,
+
+                                UpdatedDate =
+                                    p.UpdatedDate,
+
+                                UpdatedBy =
+                                    p.UpdatedBy,
+
+                                IsActive =
+                                    p.IsActive,
+
+                                BoxHeight = 
+                                    p.BoxDimension.Height,
+
+                                BoxWidth =
+                                    p.BoxDimension.Width,
+
+                                BoxLength =
+                                    p.BoxDimension.Length
+                            }
+                    )
+
+                    .ToListAsync();
+
+
+            return package;
         }
     }
 }

@@ -28,5 +28,7 @@ namespace CourierPackage_API.Models.DTOs
         public DateTime UpdatedDate { get; set; }
         public string UpdatedBy { get; set; } = string.Empty;
         public bool IsActive { get; set; }
+        public string VerifiedBy { get; set; } = string.Empty;
+        public DateTime VerifiedDate { get; set; }
     }
 }

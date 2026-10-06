@@ -55,5 +55,12 @@ namespace CourierPackage_API.Services
         {
             return await _packageRepository.DeactivatePackage(packageId, trnUser);
         }
+
+        public async Task<List<PackageResponseDto>?> GetByUserId(
+            string userId
+        )
+        {
+            return await _packageRepository.GetByUserId(userId );
+        }
     }
 }

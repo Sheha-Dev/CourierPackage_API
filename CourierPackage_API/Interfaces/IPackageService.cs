@@ -30,5 +30,9 @@ namespace CourierPackage_API.Interfaces
                 int packageId,
                 string trnUser
             );
+
+        Task<List<PackageResponseDto>> GetByUserId(
+            string userId
+        );
     }
 }
